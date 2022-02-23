@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Dynamic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -9,6 +10,7 @@ using Elsa.Server.Api.Swagger.Examples;
 using Elsa.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using Swashbuckle.AspNetCore.Annotations;
 using Swashbuckle.AspNetCore.Filters;
 
@@ -87,8 +89,8 @@ namespace Elsa.Server.Api.Endpoints.WorkflowDefinitions
             if (string.IsNullOrWhiteSpace(json))
                 return new Variables();
 
-            var dictionary = _contentSerializer.Deserialize<Dictionary<string, object?>>(json);
-            var variables = new Variables(dictionary);
+            var dictionary = JsonConvert.DeserializeObject<ExpandoObject>(json, new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.Auto, TypeNameAssemblyFormatHandling = TypeNameAssemblyFormatHandling.Simple }) as IDictionary<string, object?>;
+            var variables = new Variables(dictionary as IDictionary<string, object?>);
 
             return variables;
         }
